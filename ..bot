@@ -1,0 +1,254 @@
+//const Discord = require('discord.js');
+//const client = new Discord.Client();
+//const fs = require('fs')
+//const util = require('util')
+const mineflayer = require('mineflayer')
+//const readFile = (fileName) => util.promisify(fs.readFile)(fileName, 'utf8')
+var cron = require("cron");
+
+const config = {
+  host: 'play.hiranetwork.com',
+  port: 25565,
+  hesaplar: "sirosman,fatihreyiz,Xtahsin,zUser,dorukcum",
+  interval: 10000, // cooldown between joining server too prevent joining too quickly
+  token: "ODgwMDI3OTY5ODQwNjE1NDM0.YSYT6g.HiLuzVqzI1kkgMkk5xDtJn1eiYY"
+}
+
+Slet eventvakti=0;
+let paravakti=0;
+
+function makeBot (_u, ix) {
+  console.log("a")
+  return new Promise((resolve, reject) => {
+  console.log("b")
+    setTimeout(() => {
+    console.log("c")
+      const bot = mineflayer.createBot({
+        username: _u,
+        //password: _p,
+        host: config.host,
+        port: config.port
+      })
+      bot.on("login", async => {
+        try{
+          bot.chat("/login mahmut723");
+          setTimeout(function() {
+            bot.chat("/faction");
+          }, 10000);
+          setTimeout(function() {
+            bot.chat("/home");
+          }, 20000);
+          setTimeout(function() {
+          const items = bot.inventory.items();
+          const timeout = 1000;
+          const dropper = (i) => {
+          if (!items[i]) return;
+          bot.tossStack(items[i], () => {
+          setTimeout(() => dropper(i + 1), timeout) 
+          })
+          }
+          dropper(0);
+            /*setTimeout(function() {
+            bot.chat("/spawn");
+            }, 60000);*/
+          }, 30000);
+
+          let job1 = new cron.CronJob('00 05 12,17 * * *', function() {
+            bot.chat("/home");
+            setTimeout(function() {
+            const items = bot.inventory.items();
+            const timeout = 1000;
+            const dropper = (i) => {
+            if (!items[i]) return;
+            bot.tossStack(items[i], () => {
+            setTimeout(() => dropper(i + 1), timeout) 
+            })
+            }
+            dropper(0);
+            setTimeout(function() {
+            //bot.quit();
+            bot.chat("/spawn");
+            }, 60000);
+            }, 10000);
+          });
+          job1.start();
+
+          let job2 = new cron.CronJob('00 10 12,17 * * *', function() {
+            eventvakti=0;
+            bot.quit();
+          });
+          job2.start();
+
+          }          
+        catch(err) {
+          console.error(err);
+        }
+      });
+      bot.on('spawn', () => resolve(bot))
+      //bot.on('error', (err) => reject(err))
+      bot.on('error', (err) => console.log(err))
+      //bot.on('end', () => { makeBot(_u, ix) })//(?)
+      
+      /*Test*///let job1 = new cron.CronJob('00 05 12,17 * * *', function() {
+      /*let job1 = new cron.CronJob('00 05 12,17 * * *', function() {
+   
+      bot.chat("/home");
+      setTimeout(function() {
+      const items = bot.inventory.items();
+      const timeout = 1000;
+      const dropper = (i) => {
+        if (!items[i]) return;
+        bot.tossStack(items[i], () => {
+          setTimeout(() => dropper(i + 1), timeout) 
+        })
+      }
+      dropper(0);
+      setTimeout(function() {
+      //bot.quit();
+      bot.chat("/spawn");
+      }, 60000);
+      }, 10000);
+      });
+      job1.start();*/
+
+      bot.on('end', () => { if(eventvakti) { makeBot(_u, 1); } })//(?)
+    
+      /*Test*///let job2 = new cron.CronJob('00 10 12,17 * * *', function() {
+      /*let job2 = new cron.CronJob('00 10 12,17 * * *', function() {
+      eventvakti=0;
+      bot.quit();
+      });
+      job2.start();*/
+      //console.log(ix)
+
+     /*Bu kisim ne*///setTimeout(() => reject(Error('Took too long to spawn.')), 5000) // 5 sec
+    }, config.interval * ix)
+  })
+}
+
+function makeBotPara (_u, ix) {
+  console.log("a")
+  return new Promise((resolve, reject) => {
+  console.log("b")
+    setTimeout(() => {
+    console.log("c")
+      const bot = mineflayer.createBot({
+        username: _u,
+        //password: _p,
+        host: config.host,
+        port: config.port
+      })
+      bot.on("login", async => {
+        try{
+          bot.chat("/login mahmut723");
+          setTimeout(function() {
+            bot.chat("/faction");
+          }, 10000);
+
+          let job1 = new cron.CronJob('00 50 00 04,09,14,19,24,29 * * * * *', function() {
+          for (let i = 0; i < 50; i++) {
+          setTimeout(function() {
+            bot.chat("/pay xDarkNinja1 10000000");
+          }, 1000*i);
+          }
+          });
+          job1.start();
+
+          let job2 = new cron.CronJob('00 55 00 04,09,14,19,24,29 * * * * *', function() {
+          paravakti=0;
+          bot.quit();
+          });
+          job2.start();
+
+          }          
+        catch(err) {
+          console.error(err);
+        }
+      });
+
+      bot.on('spawn', () => resolve(bot))
+      bot.on('error', (err) => console.log(err))
+      bot.on('end', () => { if(paravakti) { makeBot(_u, 1); } })//(?)
+    
+      
+
+     /*Bu kisim ne*///setTimeout(() => reject(Error('Took too long to spawn.')), 5000) // 5 sec
+    }, config.interval * ix)
+  })
+}
+
+function start() {
+if(!eventvakti){
+console.log("Event botları giriyor...");
+eventvakti=1;
+const accounts = config.hesaplar.split(',')//test.split(/\r?\n/).map(login => login.split(':'))
+//const botProms = accounts.map(makeBotPara)
+i=0;
+accounts.forEach(account => {
+makeBot(account,i)
+//console.log(account)
+i++;
+})
+//accounts.map(console.log)
+}
+}
+
+function para() {
+if(!paravakti){
+console.log("Para botları giriyor...");
+paravakti=1;
+const accounts = config.hesaplar.split(',')//test.split(/\r?\n/).map(login => login.split(':'))
+//const botProms = accounts.map(makeBot)
+i=0;
+accounts.forEach(account => {
+makeBotPara(account,i)
+//console.log(account)
+i++;
+})
+//accounts.map(console.log)
+}
+}
+
+//client.on("ready", () => {
+  console.log("Bot başlatıldı");
+  /*Test*///let startjob = new cron.CronJob('00,20,40 40 11,16 * * *', start); 
+  let startjob = new cron.CronJob('00,20,40 00 11,16 * * *', start); 
+  startjob.start();
+  let parajob = new cron.CronJob('00,20,40 00 00 04,09,14,19,24,29 * *', para); 
+  parajob.start();
+  //start();
+  //para();
+//});
+
+
+
+
+
+
+
+
+
+
+/*Test*///let startjob = new cron.CronJob('00 24 10 * * *', start); 
+//let startjob = new cron.CronJob('00 55 11,16 * * *', start); 
+//startjob.start();
+//start();
+//let test = "xDarkNinja1:xDarkNinja1\nxDarkNinja2:xDarkNinja2\nxDarkNinja3:xDarkNinja3\nxDarkNinja4:xDarkNinja4\nxDarkNinja5:xDarkNinja5";
+
+//async function main () {
+  // convert accounts.txt => array
+  //const file = await readFile(config.file)
+  /*Test*///let job1 = new cron.CronJob('00 10 21 * * *', function() {
+  //let job1 = new cron.CronJob('00 55 11,16 * * *', function() {
+  //const accounts = config.hesaplar.split(',')//test.split(/\r?\n/).map(login => login.split(':'))
+  //const botProms = accounts.map(makeBot)
+  // const bots = await Promise.allSettled(botProms)
+  //const bots = (await Promise.allSettled(botProms)).map(({ value, reason }) => value || reason).filter(value => !(value instanceof Error))
+  //console.log(`Bots (${bots.length} / ${accounts.length}) successfully logged in.`)
+  //});
+//job1.start();
+//}
+
+//main()
+
+//client.login(config.token);
